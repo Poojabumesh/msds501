@@ -125,3 +125,4 @@ def test_center_crop_invalid():
     with pytest.raises(ValueError):
         center_crop(sample_image5, 6, 3)
 
+# test changes
