@@ -19,7 +19,7 @@ def horizontal_flip(im):
     """
     im_flipped = im.copy()
     width, height = im.shape
-    ## YOUR CODE HERE
+    im_flipped = im_flipped[:,::-1]
     return im_flipped
 
 
@@ -44,7 +44,20 @@ def region_avg(im, ic, jc, k=3):
         >>> region_avg(image, 1, 1)
         5.0
     """
-    ## YOUR CODE HERE
+    rows,cols = im.shape
+    half_k = k // 2
+
+    
+    start_row = max(ic - half_k, 0)
+    end_row = min(ic + half_k + 1, rows)
+    start_col = max(jc - half_k, 0)
+    end_col = min(jc + half_k + 1, cols)
+    
+    
+    region = im[start_row:end_row, start_col:end_col]
+
+    #average value
+    mean_region = np.mean(region)
     return mean_region
 
 
@@ -60,7 +73,14 @@ def blur(im, k=3):
         numpy.ndarray: Blurred image represented as a 2D NumPy array.
 
     """
-    ## YOUR CODE HERE
+    rows, cols = im.shape
+    
+    im_blurred = np.zeros((rows, cols))
+
+    for ic in range(rows):
+        for jc in range(cols):
+            im_blurred[ic, jc] = region_avg(im, ic, jc, k)
+    
     return im_blurred 
 
 
@@ -85,8 +105,18 @@ def region_median(im, ic, jc, k=3):
         >>> region_avg(image, 1, 1)
         5.0
     """
-    ## YOUR CODE HERE
-    return np.median(l)
+    half_k = k // 2
+    rows, cols = im.shape
+
+    start_row = max(ic - half_k, 0)
+    end_row = min(ic + half_k + 1, rows)
+    start_col = max(jc - half_k, 0)
+    end_col = min(jc + half_k + 1, cols)
+
+    # Extract the region
+    region = im[start_row:end_row, start_col:end_col]
+    
+    return np.median(region)
 
 
 def denoise(im, k=3):
@@ -109,7 +139,14 @@ def denoise(im, k=3):
                [5, 5, 5],
                [5, 5, 5]], dtype=uint8)
     """
-    ## YOUR CODE HERE
+    rows, cols = im.shape
+    
+    im_denoised = np.zeros((rows, cols), dtype=im.dtype)
+
+    for ic in range(rows):
+        for jc in range(cols):
+            im_denoised[ic, jc] = region_median(im, ic, jc, k)
+    
     return im_denoised
 
 
@@ -134,7 +171,14 @@ def thresholding(im, threshold=100):
                [  0, 255, 255],
                [  0, 255, 255]], dtype=uint8)
     """
-    ## YOUR CODE HERE
+    im_th = im.copy()
+    rows,cols = im.shape
+    for row in im_th:
+        for i in range(cols):
+            if row[i] > threshold:
+                row[i] = 255
+            if row[i] <= threshold:
+                row[i] = 0
     return im_th
 
 # center crop changes
@@ -159,9 +203,19 @@ def center_crop(im, x_size, y_size):
                [12, 13, 14],
                [17, 18, 19])
     """
-    # Here is how you can define the center
-    width, height = im.shape
-    ic = width // 2
-    jc = height // 2
-    ## YOUR CODE HERE
+        # Get the dimensions of the image
+    height, width = im.shape
+    
+    # Check if the crop size is valid
+    if x_size > width or y_size > height:
+        raise ValueError("Crop size must be smaller than the dimensions of the image.")
+    
+    # starting and ending points for the crop
+    start_x = (width - x_size) // 2
+    end_x = start_x + x_size
+    start_y = (height - y_size) // 2
+    end_y = start_y + y_size
+    
+    im_cropped = im[start_y:end_y, start_x:end_x]
+    
     return im_cropped
