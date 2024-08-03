@@ -12,7 +12,11 @@ def reverse_string(s):
     >>> print(s)
     ['o', 'l', 'l', 'e', 'h']
     """
-    # Your code here
+    left, right = 0, len(s) - 1
+    while left < right:
+        s[left], s[right] = s[right], s[left]
+        left += 1
+        right -= 1
 
 
 def find_max_average(nums, k):
@@ -34,7 +38,14 @@ def find_max_average(nums, k):
     The contiguous subarray with the maximum average is [12, -5, -6, 50] 
     and the average value is (12 + -5 + -6 + 50) / 4 = 51 / 4 = 12.75.
     """
-    # Your code here
+    max_sum = sum(nums[:k])
+    current_sum = max_sum
+
+    for i in range(k, len(nums)):
+        current_sum += nums[i] - nums[i - k]
+        max_sum = max(max_sum, current_sum)
+    
+    return max_sum / k
 
 
 def find_numbers(nums):
@@ -51,7 +62,14 @@ def find_numbers(nums):
     In this example, the numbers 1, 2, 3, 6, 7, and 8 are adjacent to other numbers, 
     so only 10 is returned in the result.
     """
-    # Your code here
+    num_set = set(nums)
+    unique_numbers = []
+
+    for num in nums:
+        if (num + 1 not in num_set) and (num - 1 not in num_set):
+            unique_numbers.append(num)
+    
+    return unique_numbers
 
 
 def contains_duplicate(nums):
@@ -73,7 +91,12 @@ def contains_duplicate(nums):
     >>> contains_duplicate([])
     False
     """
-    # Your code here
+    num_set = set()
+    for num in nums:
+        if num in num_set:
+            return True
+        num_set.add(num)
+    return False
 
 
 def find_winners_and_losers(matches):
@@ -104,4 +127,14 @@ def find_winners_and_losers(matches):
     """
     from collections import defaultdict
 
-    # Your code here
+    loss_count = defaultdict(int)
+    winners = set()
+
+    for winner, loser in matches:
+        winners.add(winner)
+        loss_count[loser] += 1
+
+    no_losses = [player for player in winners if loss_count[player] == 0]
+    one_loss = [player for player, count in loss_count.items() if count == 1]
+
+    return [sorted(no_losses), sorted(one_loss)]
